@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Navigation, BarChart3, Award, ShoppingBag, Wind, Menu, X, ExternalLink, Sparkles } from 'lucide-react';
+import { Navigation, BarChart3, Award, ShoppingBag, Wind, Menu, X, Sparkles } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,14 +26,9 @@ const Navbar = () => {
               <Navigation className="w-5 h-5 text-slate-950 stroke-[2.5]" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-emerald-100 to-emerald-400 bg-clip-text text-transparent">
-                  EcoVerse
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Demo
-                </span>
-              </div>
+              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-emerald-100 to-emerald-400 bg-clip-text text-transparent">
+                EcoVerse
+              </span>
               <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Clean Air Navigation</p>
             </div>
           </Link>
@@ -60,16 +55,6 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <a
-              href="https://github.com/Sunnykum74/EcoVerse"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-700/70 hover:border-slate-600 rounded-lg transition-colors"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>GitHub</span>
-            </a>
-
             <Link
               to="/route"
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 rounded-lg shadow-md shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"

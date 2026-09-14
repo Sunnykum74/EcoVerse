@@ -15,90 +15,94 @@ const RoutePlanner = () => {
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    if (!mapInstanceRef.current) {
-      // Create Leaflet map instance
-      mapInstanceRef.current = L.map(mapContainerRef.current, {
-        center: activeRouteData.center,
-        zoom: activeRouteData.zoom,
-        zoomControl: true,
-        attributionControl: false,
-        preferCanvas: true
-      });
-
-      // 100% Open-Source Keyless Map Layer (Zero Watermark / No API Key Required)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        subdomains: ['a', 'b', 'c'],
-        keepBuffer: 6
-      }).addTo(mapInstanceRef.current);
-
-      layerGroupRef.current = L.layerGroup().addTo(mapInstanceRef.current);
-    } else {
-      mapInstanceRef.current.setView(activeRouteData.center, activeRouteData.zoom);
+    // Reset previous map instance to ensure clean tile reload
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
     }
 
-    // Force recalculation of container dimensions
+    // Create fresh Leaflet map instance
+    const map = L.map(mapContainerRef.current, {
+      center: activeRouteData.center,
+      zoom: activeRouteData.zoom,
+      zoomControl: true,
+      attributionControl: false,
+      preferCanvas: true
+    });
+    mapInstanceRef.current = map;
+
+    // Standard OpenStreetMap Tile Layer (100% Free, Keyless, No Watermark)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const layerGroup = L.layerGroup().addTo(map);
+    layerGroupRef.current = layerGroup;
+
+    const { fastRoute, ecoRoute, start, end } = activeRouteData;
+
+    const createMarkerIcon = (color, text) => {
+      return L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="background-color: ${color}; color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 9999px; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); white-space: nowrap;">${text}</div>`,
+        iconSize: [80, 24],
+        iconAnchor: [40, 12]
+      });
+    };
+
+    L.marker(start.coords, { icon: createMarkerIcon('#10b981', 'START 🚩') })
+      .bindPopup(`<b>${start.name}</b>`)
+      .addTo(layerGroup);
+
+    L.marker(end.coords, { icon: createMarkerIcon('#0284c7', 'DESTINATION 🏁') })
+      .bindPopup(`<b>${end.name}</b>`)
+      .addTo(layerGroup);
+
+    // Fast Route Polyline
+    const fastLine = L.polyline(fastRoute.path, {
+      color: '#ef4444',
+      weight: 6,
+      opacity: activeTab === 'eco' ? 0.2 : 0.9,
+      dashArray: '8, 8',
+    }).addTo(layerGroup);
+    fastLine.bindPopup(`<b>${fastRoute.name}</b><br/>Avg AQI: ${fastRoute.avgAQI} (${fastRoute.aqiCategory})<br/>PM2.5: ${fastRoute.pm25InhaledUg} µg`);
+
+    // Eco Route Polyline
+    const ecoLine = L.polyline(ecoRoute.path, {
+      color: '#10b981',
+      weight: 7,
+      opacity: activeTab === 'fast' ? 0.2 : 0.95,
+    }).addTo(layerGroup);
+    ecoLine.bindPopup(`<b>${ecoRoute.name}</b><br/>Avg AQI: ${ecoRoute.avgAQI} (${ecoRoute.aqiCategory})<br/>PM2.5 Inhaled: ${ecoRoute.pm25InhaledUg} µg (Cleaner!)`);
+
+    // Segment checkpoints
+    ecoRoute.path.forEach((pt, idx) => {
+      if (idx > 0 && idx < ecoRoute.path.length - 1) {
+        const segInfo = ecoRoute.segments[idx - 1] || { name: 'Clean Corridor Segment', aqi: 120 };
+        L.circleMarker(pt, {
+          radius: 7,
+          color: '#065f46',
+          fillColor: '#34d399',
+          fillOpacity: 1,
+          weight: 2
+        }).bindPopup(`<b>${segInfo.name}</b><br/>AQI Level: ${segInfo.aqi}`).addTo(layerGroup);
+      }
+    });
+
     const timer = setTimeout(() => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.invalidateSize();
       }
     }, 150);
 
-    if (layerGroupRef.current) {
-      layerGroupRef.current.clearLayers();
-
-      const { fastRoute, ecoRoute, start, end } = activeRouteData;
-
-      const createMarkerIcon = (color, text) => {
-        return L.divIcon({
-          className: 'custom-div-icon',
-          html: `<div style="background-color: ${color}; color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 9999px; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); white-space: nowrap;">${text}</div>`,
-          iconSize: [80, 24],
-          iconAnchor: [40, 12]
-        });
-      };
-
-      L.marker(start.coords, { icon: createMarkerIcon('#10b981', 'START 🚩') })
-        .bindPopup(`<b>${start.name}</b>`)
-        .addTo(layerGroupRef.current);
-
-      L.marker(end.coords, { icon: createMarkerIcon('#0284c7', 'DESTINATION 🏁') })
-        .bindPopup(`<b>${end.name}</b>`)
-        .addTo(layerGroupRef.current);
-
-      // Fast Route Polyline
-      const fastLine = L.polyline(fastRoute.path, {
-        color: '#ef4444',
-        weight: 6,
-        opacity: activeTab === 'eco' ? 0.2 : 0.9,
-        dashArray: '8, 8',
-      }).addTo(layerGroupRef.current);
-      fastLine.bindPopup(`<b>${fastRoute.name}</b><br/>Avg AQI: ${fastRoute.avgAQI} (${fastRoute.aqiCategory})<br/>PM2.5: ${fastRoute.pm25InhaledUg} µg`);
-
-      // Eco Route Polyline
-      const ecoLine = L.polyline(ecoRoute.path, {
-        color: '#10b981',
-        weight: 7,
-        opacity: activeTab === 'fast' ? 0.2 : 0.95,
-      }).addTo(layerGroupRef.current);
-      ecoLine.bindPopup(`<b>${ecoRoute.name}</b><br/>Avg AQI: ${ecoRoute.avgAQI} (${ecoRoute.aqiCategory})<br/>PM2.5 Inhaled: ${ecoRoute.pm25InhaledUg} µg (Cleaner!)`);
-
-      // Segment checkpoints
-      ecoRoute.path.forEach((pt, idx) => {
-        if (idx > 0 && idx < ecoRoute.path.length - 1) {
-          const segInfo = ecoRoute.segments[idx - 1] || { name: 'Clean Corridor Segment', aqi: 120 };
-          L.circleMarker(pt, {
-            radius: 7,
-            color: '#065f46',
-            fillColor: '#34d399',
-            fillOpacity: 1,
-            weight: 2
-          }).bindPopup(`<b>${segInfo.name}</b><br/>AQI Level: ${segInfo.aqi}`).addTo(layerGroupRef.current);
-        }
-      });
-    }
-
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, [selectedRouteKey, activeTab]);
 
   return (

@@ -25,11 +25,11 @@ const RoutePlanner = () => {
         preferCanvas: true
       });
 
-      // Crystal clear, fast tile provider (CartoDB Voyager or Humanitarian OSM)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      // 100% Open-Source Keyless Map Layer (Zero Watermark / No API Key Required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        subdomains: 'abcd',
-        keepBuffer: 8
+        subdomains: ['a', 'b', 'c'],
+        keepBuffer: 6
       }).addTo(mapInstanceRef.current);
 
       layerGroupRef.current = L.layerGroup().addTo(mapInstanceRef.current);
@@ -37,7 +37,7 @@ const RoutePlanner = () => {
       mapInstanceRef.current.setView(activeRouteData.center, activeRouteData.zoom);
     }
 
-    // Force recalculation of container dimensions so all tiles load seamlessly without black squares
+    // Force recalculation of container dimensions
     const timer = setTimeout(() => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.invalidateSize();

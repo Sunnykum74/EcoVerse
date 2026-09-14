@@ -194,12 +194,84 @@ export const POLLUTION_SECTORS = [
 ];
 
 export const ECO_PRODUCTS = [
-  { id: 1, name: "Smart Air Quality Portable Monitor", category: "Hardware", price: "₹2,499", rating: 4.8, ecoScore: "+92 pts", desc: "Real-time laser sensor for PM2.5 and TVOC with Bluetooth phone alerts.", tag: "Popular" },
-  { id: 2, name: "HEPA Activated Carbon Cabin Filter", category: "Mobility", price: "₹899", rating: 4.9, ecoScore: "+65 pts", desc: "99.97% microscopic particulate capture for in-car clean air routing.", tag: "Best Seller" },
-  { id: 3, name: "Solar Commuter Backpack", category: "Daily Life", price: "₹1,899", rating: 4.7, ecoScore: "+80 pts", desc: "Integrated 10W flexible solar panel with USB fast charging on the go.", tag: "Eco Choice" },
-  { id: 4, name: "Smart Plug Energy Optimizer", category: "Energy", price: "₹749", rating: 4.6, ecoScore: "+45 pts", desc: "Auto cut-off phantom load and scheduled energy consumption tracking.", tag: "Save 20%" },
-  { id: 5, name: "Bamboo Fiber Insulated Tumbler", category: "Daily Life", price: "₹499", rating: 4.9, ecoScore: "+30 pts", desc: "100% biodegradable zero-plastic thermal mug for daily travel.", tag: "Zero Waste" },
-  { id: 6, name: "Foldable Electric Commuter Bike", category: "Mobility", price: "₹24,999", rating: 4.9, ecoScore: "+250 pts", desc: "45km range on single charge, zero emissions, fits directly in metro trains.", tag: "Flagship" },
+  {
+    id: 1,
+    name: "Smart Air Quality Portable Monitor",
+    category: "Hardware",
+    price: "₹2,499",
+    rating: 4.8,
+    reviews: 142,
+    ecoScore: "+92 pts",
+    carbonSavings: "-18 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1584744982491-665216d95f8b?auto=format&fit=crop&w=600&q=80",
+    desc: "Real-time laser sensor for PM2.5, PM10, and TVOC with Bluetooth alerts and route sync.",
+    tag: "Top Rated"
+  },
+  {
+    id: 2,
+    name: "HEPA Activated Carbon Cabin Filter",
+    category: "Mobility",
+    price: "₹899",
+    rating: 4.9,
+    reviews: 320,
+    ecoScore: "+65 pts",
+    carbonSavings: "-8 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=600&q=80",
+    desc: "99.97% microscopic particulate capture for in-car clean air routing on polluted highways.",
+    tag: "Best Seller"
+  },
+  {
+    id: 3,
+    name: "Solar Commuter Backpack",
+    category: "Daily Life",
+    price: "₹1,899",
+    rating: 4.7,
+    reviews: 89,
+    ecoScore: "+80 pts",
+    carbonSavings: "-25 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
+    desc: "Integrated 10W flexible solar panel with USB fast charging on the go for urban commuters.",
+    tag: "Eco Choice"
+  },
+  {
+    id: 4,
+    name: "Smart Plug Energy Optimizer",
+    category: "Energy",
+    price: "₹749",
+    rating: 4.6,
+    reviews: 215,
+    ecoScore: "+45 pts",
+    carbonSavings: "-45 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
+    desc: "Auto cut-off phantom standby load and automated energy consumption tracking.",
+    tag: "Save 20%"
+  },
+  {
+    id: 5,
+    name: "Bamboo Fiber Insulated Flask",
+    category: "Daily Life",
+    price: "₹499",
+    rating: 4.9,
+    reviews: 412,
+    ecoScore: "+30 pts",
+    carbonSavings: "-12 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80",
+    desc: "100% biodegradable zero-plastic thermal flask keeping drinks hot/cold for 12 hours.",
+    tag: "Zero Waste"
+  },
+  {
+    id: 6,
+    name: "Foldable Electric Commuter Bike",
+    category: "Mobility",
+    price: "₹24,999",
+    rating: 4.9,
+    reviews: 94,
+    ecoScore: "+250 pts",
+    carbonSavings: "-380 kg CO₂/yr",
+    image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80",
+    desc: "45km range on a single charge, zero tailpipe emissions, seamlessly fits into metro trains.",
+    tag: "Flagship"
+  }
 ];
 
 export const LEADERBOARD_DATA = [

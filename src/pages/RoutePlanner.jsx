@@ -16,22 +16,33 @@ const RoutePlanner = () => {
     if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
+      // Create Leaflet map instance
       mapInstanceRef.current = L.map(mapContainerRef.current, {
         center: activeRouteData.center,
         zoom: activeRouteData.zoom,
         zoomControl: true,
-        attributionControl: false
+        attributionControl: false,
+        preferCanvas: true
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Crystal clear, fast tile provider (CartoDB Voyager or Humanitarian OSM)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd',
+        keepBuffer: 8
       }).addTo(mapInstanceRef.current);
 
       layerGroupRef.current = L.layerGroup().addTo(mapInstanceRef.current);
     } else {
       mapInstanceRef.current.setView(activeRouteData.center, activeRouteData.zoom);
     }
+
+    // Force recalculation of container dimensions so all tiles load seamlessly without black squares
+    const timer = setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 150);
 
     if (layerGroupRef.current) {
       layerGroupRef.current.clearLayers();
@@ -41,7 +52,7 @@ const RoutePlanner = () => {
       const createMarkerIcon = (color, text) => {
         return L.divIcon({
           className: 'custom-div-icon',
-          html: `<div style="background-color: ${color}; color: #000; font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 9999px; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.5); white-space: nowrap;">${text}</div>`,
+          html: `<div style="background-color: ${color}; color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 9999px; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); white-space: nowrap;">${text}</div>`,
           iconSize: [80, 24],
           iconAnchor: [40, 12]
         });
@@ -51,39 +62,43 @@ const RoutePlanner = () => {
         .bindPopup(`<b>${start.name}</b>`)
         .addTo(layerGroupRef.current);
 
-      L.marker(end.coords, { icon: createMarkerIcon('#38bdf8', 'DESTINATION 🏁') })
+      L.marker(end.coords, { icon: createMarkerIcon('#0284c7', 'DESTINATION 🏁') })
         .bindPopup(`<b>${end.name}</b>`)
         .addTo(layerGroupRef.current);
 
+      // Fast Route Polyline
       const fastLine = L.polyline(fastRoute.path, {
         color: '#ef4444',
-        weight: 5,
-        opacity: activeTab === 'eco' ? 0.25 : 0.85,
+        weight: 6,
+        opacity: activeTab === 'eco' ? 0.2 : 0.9,
         dashArray: '8, 8',
       }).addTo(layerGroupRef.current);
-      fastLine.bindPopup(`<b>${fastRoute.name}</b><br/>AQI: ${fastRoute.avgAQI} (${fastRoute.aqiCategory})<br/>PM2.5: ${fastRoute.pm25InhaledUg} µg`);
+      fastLine.bindPopup(`<b>${fastRoute.name}</b><br/>Avg AQI: ${fastRoute.avgAQI} (${fastRoute.aqiCategory})<br/>PM2.5: ${fastRoute.pm25InhaledUg} µg`);
 
+      // Eco Route Polyline
       const ecoLine = L.polyline(ecoRoute.path, {
         color: '#10b981',
-        weight: 6,
-        opacity: activeTab === 'fast' ? 0.25 : 0.95,
+        weight: 7,
+        opacity: activeTab === 'fast' ? 0.2 : 0.95,
       }).addTo(layerGroupRef.current);
-      ecoLine.bindPopup(`<b>${ecoRoute.name}</b><br/>AQI: ${ecoRoute.avgAQI} (${ecoRoute.aqiCategory})<br/>PM2.5 Inhaled: ${ecoRoute.pm25InhaledUg} µg (Cleaner!)`);
+      ecoLine.bindPopup(`<b>${ecoRoute.name}</b><br/>Avg AQI: ${ecoRoute.avgAQI} (${ecoRoute.aqiCategory})<br/>PM2.5 Inhaled: ${ecoRoute.pm25InhaledUg} µg (Cleaner!)`);
 
+      // Segment checkpoints
       ecoRoute.path.forEach((pt, idx) => {
         if (idx > 0 && idx < ecoRoute.path.length - 1) {
           const segInfo = ecoRoute.segments[idx - 1] || { name: 'Clean Corridor Segment', aqi: 120 };
           L.circleMarker(pt, {
-            radius: 6,
-            color: '#10b981',
+            radius: 7,
+            color: '#065f46',
             fillColor: '#34d399',
-            fillOpacity: 0.9,
+            fillOpacity: 1,
             weight: 2
           }).bindPopup(`<b>${segInfo.name}</b><br/>AQI Level: ${segInfo.aqi}`).addTo(layerGroupRef.current);
         }
       });
     }
 
+    return () => clearTimeout(timer);
   }, [selectedRouteKey, activeTab]);
 
   return (
